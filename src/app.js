@@ -34,7 +34,19 @@ app.get("/", (req, res) => {
 // Products Routes
 
 app.get("/products", (req, res) => {
-  const { id } = req.query;
+  db.all("SELECT * FROM products", (err, rows) => {
+    if (err) {
+      console.log("Error running sql: " + err);
+      res.status(500).json({ message: "Internal Server Error" });
+      return;
+    }
+
+    res.json({ message: "List of products", data: rows });
+  });
+});
+
+app.get("/products/:id", (req, res) => {
+  const { id } = req.params;
 
   if (id) {
     db.get("SELECT * FROM products WHERE id = ?", [id], (err, row) => {
@@ -73,6 +85,21 @@ app.post("/products", (req, res) => {
   });
 });
 
+app.put("/products/:id", (req, res) => {
+  const { id } = req.params;
+  const { name, price } = req.body;
+
+  db.run("UPDATE products SET name = ?, price = ? WHERE id = ?", [name, price, id], (err) => {
+    if (err) {
+      console.log(`Error running sql: ${err}`);
+      res.status(500).json({ message: "Internal Server Error" });
+      return;
+    }
+
+    res.json({ message: `Product ${id} updated` });
+  });
+});
+
 app.delete("/products/:id", (req, res) => {
   const { id } = req.params;
 
@@ -90,7 +117,19 @@ app.delete("/products/:id", (req, res) => {
 // Students Routes
 
 app.get("/students", (req, res) => {
-  const { id } = req.query;
+  db.all("SELECT * FROM students", (err, rows) => {
+    if (err) {
+      console.log("Error running sql: " + err);
+      res.status(500).json({ message: "Internal Server Error" });
+      return;
+    }
+
+    res.json({ message: "List of students", data: rows });
+  });
+});
+
+app.get("/students/:id", (req, res) => {
+  const { id } = req.params;
 
   if (id) {
     db.get("SELECT * FROM students WHERE id = ?", [id], (err, row) => {
@@ -126,6 +165,21 @@ app.post("/students", (req, res) => {
     }
 
     res.json({ message: `Student ${this.lastID} added` });
+  });
+});
+
+app.put("/students/:id", (req, res) => {
+  const { id } = req.params;
+  const { name, age } = req.body;
+
+  db.run("UPDATE students SET name = ?, age = ? WHERE id = ?", [name, age, id], (err) => {
+    if (err) {
+      console.log(`Error running sql: ${err}`);
+      res.status(500).json({ message: "Internal Server Error" });
+      return;
+    }
+
+    res.json({ message: `Student ${id} updated` });
   });
 });
 

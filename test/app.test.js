@@ -1,84 +1,73 @@
 const request = require('supertest');
+const app = require('../src/app'); // Import your Express app
 
-const app = require('../src/app');
+let productId;
+let studentId;
 
-describe("app", () => {
-  it("responds with a not found message", (done) => {
-    request(app)
-      .get("/what-is-this-even")
-      .set("Accept", "application/json")
-      .expect("Content-Type", /json/)
-      .expect(404, done);
+describe('CRUD operations for products', () => {
+  it('should create a new product', async () => {
+    const newProduct = { name: 'Test Product', price: 10 };
+
+    const response = await request(app)
+      .post('/products')
+      .send(newProduct)
+      .expect(200);
+
+    productId = response.body.message.split(' ')[1]; // Extracting the product ID from the response
+  });
+
+  it('should retrieve a specific product', async () => {
+    await request(app)
+      .get(`/products/${productId}`)
+      .expect(200);
+  });
+
+  it('should update an existing product', async () => {
+    const updatedProduct = { name: 'Updated Product', price: 15 };
+
+    await request(app)
+      .put(`/products/${productId}`)
+      .send(updatedProduct)
+      .expect(200);
+  });
+
+  it('should delete a specific product', async () => {
+    await request(app)
+      .delete(`/products/${productId}`)
+      .expect(200);
   });
 });
 
-describe("GET /", () => {
-  it("responds with a json message", (done) => {
-    request(app)
-      .get("/")
-      .set("Accept", "application/json")
-      .expect("Content-Type", /json/)
-      .expect(
-        200,
-        {
-          message: "🦄🌈✨👋🌎🌍🌏✨🌈🦄",
-        },
-        done
-      );
-  });
-});
+describe('CRUD operations for students', () => {
+  it('should create a new student', async () => {
+    const newStudent = { name: 'Test Student', age: 20 };
 
-describe("GET /products", () => {
-  it("responds with a list of products", (done) => {
-    request(app)
-      .get("/products")
-      .set("Accept", "application/json")
-      .expect("Content-Type", /json/)
-      .expect(
-        200,
-        {
-          message: {
-            message: "list of products",
-            data: [
-              {
-                created: "2024-02-06 10:10:59.537Z",
-                id: "6b4yvewu7uocxp8",
-                name: "snus",
-                price: 90,
-                updated: "2024-02-06 10:10:59.537Z",
-              },
-              {
-                created: "2024-02-06 10:50:11.479Z",
-                id: "rdce1475d7b39aa",
-                name: "vodka",
-                price: 79,
-                updated: "2024-02-06 10:50:11.479Z",
-              },
-              {
-                created: "2024-02-06 10:54:22.072Z",
-                id: "r79ae85826950b6",
-                name: "banana",
-                price: 50,
-                updated: "2024-02-06 10:54:22.072Z",
-              },
-              {
-                created: "2024-02-06 10:54:54.063Z",
-                id: "r09e8d506f172b1",
-                name: "butter",
-                price: 80,
-                updated: "2024-02-06 10:54:54.063Z",
-              },
-              {
-                created: "2024-02-07 08:32:08.467Z",
-                id: "rc54a94be974cc4",
-                name: "butter",
-                price: 80,
-                updated: "2024-02-07 08:32:08.467Z",
-              },
-            ],
-          },
-        },
-        done
-      );
+    const response = await request(app)
+      .post('/students')
+      .send(newStudent)
+      .expect(200);
+
+    studentId = response.body.message.split(' ')[1]; // Extracting the student ID from the response
+  });
+
+  it('should retrieve a specific student', async () => {
+    await request(app)
+      .get(`/students/${studentId}`)
+      .expect(200);
+  });
+
+  it('should update an existing student', async () => {
+    const updatedStudent = { name: 'Updated Student', age: 25 };
+
+    await request(app)
+      .put(`/students/${studentId}`)
+      .send(updatedStudent)
+      .expect(200);
+  });
+
+  it('should delete a specific student', async () => {
+    await request(app)
+      .delete(`/students/${studentId}`)
+      .expect(200);
   });
 });
